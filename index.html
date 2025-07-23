@@ -446,7 +446,7 @@
 </head>
 <body>
     <!-- الواجهة الرئيسية للمستخدم العادي -->
-    <div class="main-interface">
+    <div class="main-interface" id="main-interface">
         <header>
             <div class="container header-content">
                 <div class="logo">نظام التعليم</div>
@@ -600,7 +600,7 @@
         let darkMode = localStorage.getItem('darkMode') === 'true';
 
         // عناصر DOM
-        const mainInterface = document.querySelector('.main-interface');
+        const mainInterface = document.getElementById('main-interface');
         const adminPanel = document.getElementById('admin-panel');
         const loginModal = document.getElementById('login-modal');
         const loginForm = document.getElementById('login-form');
@@ -645,8 +645,21 @@
 
         // تحميل البيانات الأولية
         function loadData() {
-            renderTeachers();
-            initDarkMode();
+            // التحقق من الرابط لمعرفة إذا كان المستخدم يحاول الوصول إلى لوحة التحكم
+            const path = window.location.pathname;
+            if (path === '/admin') {
+                showLoginModal();
+            } else {
+                renderTeachers();
+                initDarkMode();
+            }
+        }
+
+        // عرض نموذج تسجيل الدخول
+        function showLoginModal() {
+            loginModal.classList.add('active');
+            mainInterface.style.display = 'none';
+            adminPanel.style.display = 'none';
         }
 
         // عرض المدرسين
@@ -909,8 +922,11 @@
             if (inputUsername === encodedUsername && inputPassword === encodedPassword) {
                 isAdmin = true;
                 mainInterface.style.display = 'none';
-                adminPanel.classList.add('active');
                 loginModal.classList.remove('active');
+                adminPanel.classList.add('active');
+                renderTeachers();
+                initDarkMode();
+                window.history.pushState(null, null, '/admin');
                 return true;
             } else {
                 loginError.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
@@ -931,6 +947,7 @@
             lecturesSection.style.display = 'none';
             currentTeacherId = null;
             currentLectureId = null;
+            window.history.pushState(null, null, '/');
         }
 
         // تبديل الوضع الليلي/النهاري
@@ -963,6 +980,12 @@
         closeLoginModal.addEventListener('click', () => {
             loginModal.classList.remove('active');
             loginError.style.display = 'none';
+            
+            // إذا لم يكن المستخدم مسجلاً دخول، أعده إلى الصفحة الرئيسية
+            if (!isAdmin) {
+                mainInterface.style.display = 'block';
+                window.history.pushState(null, null, '/');
+            }
         });
 
         loginForm.addEventListener('submit', (e) => {
@@ -1075,6 +1098,16 @@
             addLectureSection.style.display = 'none';
             currentTeacherId = null;
             currentLectureId = null;
+        });
+
+        // التعامل مع تغيير المسار
+        window.addEventListener('popstate', () => {
+            const path = window.location.pathname;
+            if (path === '/admin' && !isAdmin) {
+                showLoginModal();
+            } else if (path !== '/admin' && isAdmin) {
+                logout();
+            }
         });
 
         // تهيئة التطبيق عند التحميل
