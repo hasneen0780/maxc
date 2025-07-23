@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام التعليم | Max 2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #3498db;
@@ -60,21 +61,35 @@
         .logo {
             font-size: 24px;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .auth-buttons button {
+        .logo img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
             background-color: white;
-            color: var(--primary-color);
-            border: none;
-            padding: 8px 15px;
             border-radius: var(--border-radius);
-            cursor: pointer;
-            margin-right: 10px;
-            transition: var(--transition);
+            padding: 8px 15px;
+            width: 300px;
         }
 
-        .auth-buttons button:hover {
-            background-color: var(--light-color);
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 5px;
+        }
+
+        .search-bar i {
+            color: #777;
         }
 
         .mode-toggle {
@@ -83,6 +98,7 @@
             color: white;
             font-size: 20px;
             cursor: pointer;
+            margin-right: 15px;
         }
 
         .teachers-section {
@@ -95,6 +111,9 @@
             color: var(--dark-color);
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .teachers-grid {
@@ -126,6 +145,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .teacher-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .teacher-img .initials {
+            position: absolute;
             font-size: 50px;
             color: var(--dark-color);
         }
@@ -413,6 +444,22 @@
             margin-bottom: 10px;
         }
 
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .social-link {
+            color: white;
+            font-size: 20px;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            color: var(--light-color);
+        }
+
         .telegram-link {
             color: white;
             text-decoration: none;
@@ -431,6 +478,22 @@
             font-size: 14px;
         }
 
+        .upload-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .upload-btn input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .teachers-grid {
@@ -441,6 +504,15 @@
                 flex-direction: column;
                 gap: 0;
             }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -449,9 +521,15 @@
     <div class="main-interface" id="main-interface">
         <header>
             <div class="container header-content">
-                <div class="logo">نظام التعليم</div>
-                <div class="auth-buttons">
-                    <button id="admin-login-btn">دخول الأدمن</button>
+                <div class="logo">
+                    <img src="https://via.placeholder.com/30" alt="Logo">
+                    نظام التعليم
+                </div>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="ابحث عن مدرس...">
+                </div>
+                <div>
                     <button class="mode-toggle" id="mode-toggle">🌙</button>
                 </div>
             </div>
@@ -459,14 +537,20 @@
 
         <div class="container">
             <section class="teachers-section">
-                <h2 class="section-title">المدرسون لدينا</h2>
+                <h2 class="section-title">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    المدرسون لدينا
+                </h2>
                 <div class="teachers-grid" id="teachers-container">
                     <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
                 </div>
             </section>
 
             <section class="lectures-section" id="lectures-section" style="display: none;">
-                <h2 class="section-title" id="lectures-title">محاضرات الأستاذ</h2>
+                <h2 class="section-title" id="lectures-title">
+                    <i class="fas fa-book-open"></i>
+                    محاضرات الأستاذ
+                </h2>
                 <div class="lectures-list" id="lectures-container">
                     <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
                 </div>
@@ -475,9 +559,15 @@
 
         <footer>
             <div class="container footer-content">
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
                 <div class="copyright">جميع الحقوق محفوظة &copy; Max 2025</div>
-                <a href="#" class="telegram-link">
-                    <span>قناتنا على تليجرام</span>
+                <a href="https://t.me/max10max10bot" class="telegram-link" target="_blank">
+                    <i class="fab fa-telegram"></i>
+                    <span>بوت ملازم ماكس</span>
                 </a>
             </div>
         </footer>
@@ -507,7 +597,10 @@
     <div class="admin-panel" id="admin-panel">
         <header class="admin-header">
             <div class="container admin-nav">
-                <div class="logo">لوحة التحكم</div>
+                <div class="logo">
+                    <img src="https://via.placeholder.com/30" alt="Logo">
+                    لوحة التحكم
+                </div>
                 <nav class="admin-nav-links">
                     <a href="#" id="admin-home-link">الرئيسية</a>
                     <a href="#" id="add-teacher-link">إضافة مدرس</a>
@@ -520,7 +613,10 @@
         <div class="container">
             <!-- قسم إدارة المدرسين -->
             <div class="admin-content" id="admin-teachers-section">
-                <h2 class="section-title">إدارة المدرسين</h2>
+                <h2 class="section-title">
+                    <i class="fas fa-users-cog"></i>
+                    إدارة المدرسين
+                </h2>
                 <div class="teachers-grid" id="admin-teachers-container">
                     <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
                 </div>
@@ -528,7 +624,10 @@
 
             <!-- قسم إضافة مدرس جديد -->
             <div class="admin-content" id="add-teacher-section" style="display: none;">
-                <h2 class="section-title">إضافة مدرس جديد</h2>
+                <h2 class="section-title">
+                    <i class="fas fa-user-plus"></i>
+                    إضافة مدرس جديد
+                </h2>
                 <form id="add-teacher-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -540,6 +639,16 @@
                         <label for="teacher-desc">وصف المدرس</label>
                         <textarea id="teacher-desc" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius);" required></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="teacher-image">صورة المدرس (اختياري)</label>
+                        <div class="upload-btn">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-upload"></i> اختر صورة
+                            </button>
+                            <input type="file" id="teacher-image" accept="image/*">
+                        </div>
+                        <small>يمكنك ترك هذا الحقل فارغاً لاستخدام الأحرف الأولى كصورة</small>
+                    </div>
                     <div class="action-buttons">
                         <button type="submit" class="btn btn-primary">حفظ</button>
                         <button type="button" class="btn btn-danger" id="cancel-add-teacher">إلغاء</button>
@@ -549,8 +658,13 @@
 
             <!-- قسم إدارة المحاضرات لمدرس معين -->
             <div class="admin-content" id="manage-lectures-section" style="display: none;">
-                <h2 class="section-title" id="manage-lectures-title">إدارة محاضرات الأستاذ</h2>
-                <button class="btn btn-primary" id="add-lecture-btn">إضافة فصل جديد</button>
+                <h2 class="section-title" id="manage-lectures-title">
+                    <i class="fas fa-book"></i>
+                    إدارة محاضرات الأستاذ
+                </h2>
+                <button class="btn btn-primary" id="add-lecture-btn">
+                    <i class="fas fa-plus"></i> إضافة فصل جديد
+                </button>
                 <div class="lectures-list" id="admin-lectures-container">
                     <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
                 </div>
@@ -558,7 +672,10 @@
 
             <!-- قسم إضافة/تعديل فصل -->
             <div class="admin-content" id="add-lecture-section" style="display: none;">
-                <h2 class="section-title" id="lecture-form-title">إضافة فصل جديد</h2>
+                <h2 class="section-title" id="lecture-form-title">
+                    <i class="fas fa-plus-circle"></i>
+                    إضافة فصل جديد
+                </h2>
                 <form id="lecture-form">
                     <input type="hidden" id="lecture-id">
                     <input type="hidden" id="teacher-id">
@@ -573,8 +690,12 @@
                         </div>
                     </div>
                     <div class="action-buttons">
-                        <button type="submit" class="btn btn-primary" id="save-lecture-btn">حفظ</button>
-                        <button type="button" class="btn btn-danger" id="cancel-lecture-btn">إلغاء</button>
+                        <button type="submit" class="btn btn-primary" id="save-lecture-btn">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                        <button type="button" class="btn btn-danger" id="cancel-lecture-btn">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
                     </div>
                 </form>
             </div>
@@ -582,9 +703,15 @@
 
         <footer>
             <div class="container footer-content">
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
                 <div class="copyright">جميع الحقوق محفوظة &copy; Max 2025</div>
-                <a href="#" class="telegram-link">
-                    <span>قناتنا على تليجرام</span>
+                <a href="https://t.me/max10max10bot" class="telegram-link" target="_blank">
+                    <i class="fab fa-telegram"></i>
+                    <span>بوت ملازم ماكس</span>
                 </a>
             </div>
         </footer>
@@ -604,7 +731,6 @@
         const adminPanel = document.getElementById('admin-panel');
         const loginModal = document.getElementById('login-modal');
         const loginForm = document.getElementById('login-form');
-        const adminLoginBtn = document.getElementById('admin-login-btn');
         const closeLoginModal = document.getElementById('close-login-modal');
         const loginError = document.getElementById('login-error');
         const teachersContainer = document.getElementById('teachers-container');
@@ -627,6 +753,8 @@
         const addTeacherLink = document.getElementById('add-teacher-link');
         const adminHomeLink = document.getElementById('admin-home-link');
         const adminTeachersSection = document.getElementById('admin-teachers-section');
+        const teacherImageInput = document.getElementById('teacher-image');
+        const searchInput = document.querySelector('.search-bar input');
 
         // تهيئة الوضع الليلي
         function initDarkMode() {
@@ -662,28 +790,45 @@
             adminPanel.style.display = 'none';
         }
 
-        // عرض المدرسين
-        function renderTeachers() {
+        // عرض المدرسين مع إمكانية البحث
+        function renderTeachers(searchTerm = '') {
             teachersContainer.innerHTML = '';
             adminTeachersContainer.innerHTML = '';
 
-            if (teachers.length === 0) {
+            const filteredTeachers = teachers.filter(teacher => 
+                teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                teacher.desc.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filteredTeachers.length === 0) {
                 teachersContainer.innerHTML = '<p>لا يوجد مدرسون متاحون حالياً</p>';
                 adminTeachersContainer.innerHTML = '<p>لا يوجد مدرسون متاحون حالياً</p>';
                 return;
             }
 
-            teachers.forEach(teacher => {
+            filteredTeachers.forEach(teacher => {
                 // عرض للمستخدم العادي
                 const teacherCard = document.createElement('div');
                 teacherCard.className = 'teacher-card';
                 if (darkMode) teacherCard.classList.add('dark-mode');
+                
+                let imageContent = '';
+                if (teacher.image) {
+                    imageContent = `<img src="${teacher.image}" alt="${teacher.name}">`;
+                } else {
+                    imageContent = `<div class="initials">${teacher.name.charAt(0)}</div>`;
+                }
+                
                 teacherCard.innerHTML = `
-                    <div class="teacher-img">${teacher.name.charAt(0)}</div>
+                    <div class="teacher-img">
+                        ${imageContent}
+                    </div>
                     <div class="teacher-info">
                         <h3 class="teacher-name">${teacher.name}</h3>
                         <p class="teacher-desc">${teacher.desc}</p>
-                        <a href="#" class="view-btn" data-teacher-id="${teacher.id}">عرض المحاضرات</a>
+                        <a href="#" class="view-btn" data-teacher-id="${teacher.id}">
+                            <i class="fas fa-eye"></i> عرض المحاضرات
+                        </a>
                     </div>
                 `;
                 teachersContainer.appendChild(teacherCard);
@@ -693,14 +838,22 @@
                 adminTeacherCard.className = 'teacher-card';
                 if (darkMode) adminTeacherCard.classList.add('dark-mode');
                 adminTeacherCard.innerHTML = `
-                    <div class="teacher-img">${teacher.name.charAt(0)}</div>
+                    <div class="teacher-img">
+                        ${imageContent}
+                    </div>
                     <div class="teacher-info">
                         <h3 class="teacher-name">${teacher.name}</h3>
                         <p class="teacher-desc">${teacher.desc}</p>
                         <div class="action-buttons">
-                            <button class="btn btn-primary manage-lectures-btn" data-teacher-id="${teacher.id}">إدارة المحاضرات</button>
-                            <button class="btn btn-warning edit-teacher-btn" data-teacher-id="${teacher.id}">تعديل</button>
-                            <button class="btn btn-danger delete-teacher-btn" data-teacher-id="${teacher.id}">حذف</button>
+                            <button class="btn btn-primary manage-lectures-btn" data-teacher-id="${teacher.id}">
+                                <i class="fas fa-book"></i> إدارة المحاضرات
+                            </button>
+                            <button class="btn btn-warning edit-teacher-btn" data-teacher-id="${teacher.id}">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger delete-teacher-btn" data-teacher-id="${teacher.id}">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
                         </div>
                     </div>
                 `;
@@ -757,7 +910,9 @@
                     if (darkMode) lectureItem.classList.add('dark-mode');
                     lectureItem.innerHTML = `
                         <span class="lecture-title">${lecture.title}</span>
-                        <a href="${lecture.link}" class="lecture-link" target="_blank">الذهاب إلى المحاضرة</a>
+                        <a href="${lecture.link}" class="lecture-link" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> الذهاب إلى المحاضرة
+                        </a>
                     `;
                     lecturesContainer.appendChild(lectureItem);
                 });
@@ -786,9 +941,15 @@
                     lectureItem.innerHTML = `
                         <span class="lecture-title">${lecture.title}</span>
                         <div>
-                            <a href="${lecture.link}" class="btn btn-primary" target="_blank">عرض</a>
-                            <button class="btn btn-warning edit-lecture-btn" data-lecture-id="${lecture.id}">تعديل</button>
-                            <button class="btn btn-danger delete-lecture-btn" data-lecture-id="${lecture.id}">حذف</button>
+                            <a href="${lecture.link}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-eye"></i> عرض
+                            </a>
+                            <button class="btn btn-warning edit-lecture-btn" data-lecture-id="${lecture.id}">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger delete-lecture-btn" data-lecture-id="${lecture.id}">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
                         </div>
                     `;
                     adminLecturesContainer.appendChild(lectureItem);
@@ -972,11 +1133,30 @@
             }
         }
 
-        // مستمعي الأحداث
-        adminLoginBtn.addEventListener('click', () => {
-            loginModal.classList.add('active');
-        });
+        // تحميل صورة المدرس
+        function loadTeacherImage(teacherId) {
+            return new Promise((resolve) => {
+                const file = teacherImageInput.files[0];
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
 
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resolve(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // البحث عن المدرسين
+        function searchTeachers() {
+            const searchTerm = searchInput.value;
+            renderTeachers(searchTerm);
+        }
+
+        // مستمعي الأحداث
         closeLoginModal.addEventListener('click', () => {
             loginModal.classList.remove('active');
             loginError.style.display = 'none';
@@ -988,17 +1168,18 @@
             }
         });
 
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             login(username, password);
         });
 
-        addTeacherForm.addEventListener('submit', (e) => {
+        addTeacherForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('teacher-name').value;
             const desc = document.getElementById('teacher-desc').value;
+            const image = await loadTeacherImage();
 
             if (isEditMode && currentTeacherId) {
                 // تعديل مدرس موجود
@@ -1006,6 +1187,9 @@
                 if (teacherIndex !== -1) {
                     teachers[teacherIndex].name = name;
                     teachers[teacherIndex].desc = desc;
+                    if (image) {
+                        teachers[teacherIndex].image = image;
+                    }
                 }
             } else {
                 // إضافة مدرس جديد
@@ -1015,6 +1199,9 @@
                     desc,
                     lectures: []
                 };
+                if (image) {
+                    newTeacher.image = image;
+                }
                 teachers.push(newTeacher);
             }
 
@@ -1024,6 +1211,7 @@
             addTeacherSection.style.display = 'none';
             isEditMode = false;
             currentTeacherId = null;
+            teacherImageInput.value = '';
         });
 
         cancelAddTeacher.addEventListener('click', () => {
@@ -1031,6 +1219,7 @@
             addTeacherSection.style.display = 'none';
             isEditMode = false;
             currentTeacherId = null;
+            teacherImageInput.value = '';
         });
 
         addLectureBtn.addEventListener('click', () => {
@@ -1099,6 +1288,8 @@
             currentTeacherId = null;
             currentLectureId = null;
         });
+
+        searchInput.addEventListener('input', searchTeachers);
 
         // التعامل مع تغيير المسار
         window.addEventListener('popstate', () => {
