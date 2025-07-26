@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>max</title>
+    <title>نظام التعليم | Max 2025</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -303,9 +303,91 @@
                 width: 100%;
             }
         }
+
+        /* Subscription Modal Styles */
+        .subscription-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .subscription-box {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .subscription-box.dark-mode {
+            background-color: #2d2d2d;
+            color: white;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--danger-color);
+        }
+
+        .channel-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+        }
+
+        .join-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .join-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .subscription-text {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
+    <!-- Subscription Modal -->
+    <div class="subscription-modal" id="subscription-modal">
+        <div class="subscription-box" id="subscription-box">
+            <div class="close-btn" id="close-btn">✕</div>
+            <h2>اشترك في قناتنا على تلغرام</h2>
+            <p class="subscription-text">للاستمرار في استخدام المنصة، يرجى الاشتراك في قناتنا على تلغرام للحصول على آخر التحديثات والمحتوى الحصري.</p>
+            <img src="https://i.imghippo.com/files/IyLa8183oYA.jpg" alt="قناة تلغرام" class="channel-image">
+            <a href="https://t.me/uumm20" class="join-btn" target="_blank">
+                <i class="fab fa-telegram"></i> انضم إلى القناة
+            </a>
+        </div>
+    </div>
+
     <header>
         <div class="container header-content">
             <div class="logo">
@@ -318,7 +400,6 @@
             </div>
             <div>
                 <button class="mode-toggle" id="mode-toggle">🌙</button>
-
             </div>
         </div>
     </header>
@@ -327,7 +408,7 @@
         <section class="teachers-section">
             <h2 class="section-title">
                 <i class="fas fa-chalkboard-teacher"></i>
-                المدرسون لدينا
+                المدرسين لدينا
             </h2>
             <div class="teachers-grid" id="teachers-container">
                 <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
@@ -364,8 +445,12 @@
         // بيانات التطبيق
         let teachers = JSON.parse(localStorage.getItem('teachers')) || [];
         let darkMode = localStorage.getItem('darkMode') === 'true';
+        let subscribed = localStorage.getItem('subscribed') === 'true';
 
         // عناصر DOM
+        const subscriptionModal = document.getElementById('subscription-modal');
+        const subscriptionBox = document.getElementById('subscription-box');
+        const closeBtn = document.getElementById('close-btn');
         const teachersContainer = document.getElementById('teachers-container');
         const lecturesSection = document.getElementById('lectures-section');
         const lecturesContainer = document.getElementById('lectures-container');
@@ -383,7 +468,17 @@
                 document.querySelectorAll('.lecture-item').forEach(el => {
                     el.classList.add('dark-mode');
                 });
+                subscriptionBox.classList.add('dark-mode');
                 modeToggle.textContent = '☀️';
+            }
+        }
+
+        // التحقق من الاشتراك وعرض النافذة إذا لزم الأمر
+        function checkSubscription() {
+            if (!subscribed) {
+                subscriptionModal.style.display = 'flex';
+            } else {
+                subscriptionModal.style.display = 'none';
             }
         }
 
@@ -391,6 +486,7 @@
         function loadData() {
             renderTeachers();
             initDarkMode();
+            checkSubscription();
         }
 
         // عرض المدرسين مع إمكانية البحث
@@ -485,6 +581,7 @@
             document.querySelectorAll('.lecture-item').forEach(el => {
                 el.classList.toggle('dark-mode');
             });
+            subscriptionBox.classList.toggle('dark-mode');
 
             if (darkMode) {
                 modeToggle.textContent = '☀️';
@@ -502,6 +599,17 @@
         // مستمعي الأحداث
         modeToggle.addEventListener('click', toggleDarkMode);
         searchInput.addEventListener('input', searchTeachers);
+        closeBtn.addEventListener('click', () => {
+            // عند النقر على زر الإغلاق، نطلب من المستخدم الاشتراك أولاً
+            alert('يجب الاشتراك في القناة أولاً لاستخدام المنصة');
+        });
+
+        // عند النقر على زر الانضمام للقناة
+        document.querySelector('.join-btn').addEventListener('click', () => {
+            subscribed = true;
+            localStorage.setItem('subscribed', 'true');
+            subscriptionModal.style.display = 'none';
+        });
 
         // تهيئة التطبيق عند التحميل
         document.addEventListener('DOMContentLoaded', loadData);
