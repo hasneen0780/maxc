@@ -443,7 +443,7 @@
 
     <script>
         // بيانات التطبيق
-        let teachers = JSON.parse(localStorage.getItem('teachers')) || [];
+        let teachers = [];
         let darkMode = localStorage.getItem('darkMode') === 'true';
         let subscribed = localStorage.getItem('subscribed') === 'true';
 
@@ -482,15 +482,25 @@
             }
         }
 
-        // تحميل البيانات الأولية
-        function loadData() {
-            renderTeachers();
-            initDarkMode();
-            checkSubscription();
+        // تحميل البيانات من localStorage
+        function loadTeachers() {
+            const savedTeachers = localStorage.getItem('teachers');
+            if (savedTeachers) {
+                try {
+                    teachers = JSON.parse(savedTeachers);
+                } catch (e) {
+                    console.error('Error parsing teachers data:', e);
+                    teachers = [];
+                }
+            } else {
+                teachers = [];
+            }
         }
 
         // عرض المدرسين مع إمكانية البحث
         function renderTeachers(searchTerm = '') {
+            loadTeachers(); // تحميل أحدث البيانات قبل العرض
+            
             teachersContainer.innerHTML = '';
 
             const filteredTeachers = teachers.filter(teacher => 
@@ -499,7 +509,7 @@
             );
 
             if (filteredTeachers.length === 0) {
-                teachersContainer.innerHTML = '<p>لا يوجد مدرسون متاحون حالياً</p>';
+                teachersContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">لا يوجد مدرسون متاحون حالياً</p>';
                 return;
             }
 
@@ -512,7 +522,8 @@
                 if (teacher.image) {
                     imageContent = `<img src="${teacher.image}" alt="${teacher.name}">`;
                 } else {
-                    imageContent = `<div class="initials">${teacher.name.charAt(0)}</div>`;
+                    const initials = teacher.name.split(' ').map(n => n[0]).join('');
+                    imageContent = `<div class="initials">${initials}</div>`;
                 }
                 
                 teacherCard.innerHTML = `
@@ -542,6 +553,8 @@
 
         // عرض محاضرات مدرس معين
         function showTeacherLectures(teacherId) {
+            loadTeachers(); // تحميل أحدث البيانات قبل العرض
+            
             const teacher = teachers.find(t => t.id === teacherId);
             if (!teacher) return;
 
@@ -600,11 +613,9 @@
         modeToggle.addEventListener('click', toggleDarkMode);
         searchInput.addEventListener('input', searchTeachers);
         closeBtn.addEventListener('click', () => {
-            // عند النقر على زر الإغلاق، نطلب من المستخدم الاشتراك أولاً
             alert('يجب الاشتراك في القناة أولاً لاستخدام المنصة');
         });
 
-        // عند النقر على زر الانضمام للقناة
         document.querySelector('.join-btn').addEventListener('click', () => {
             subscribed = true;
             localStorage.setItem('subscribed', 'true');
@@ -612,7 +623,12 @@
         });
 
         // تهيئة التطبيق عند التحميل
-        document.addEventListener('DOMContentLoaded', loadData);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTeachers();
+            renderTeachers();
+            initDarkMode();
+            checkSubscription();
+        });
     </script>
 </body>
 </html>
