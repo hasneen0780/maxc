@@ -657,8 +657,7 @@
 
         // عرض المدرسين
         function renderTeachers() {
-            loadTeachers(); // تحميل أحدث البيانات قبل العرض
-            
+            loadTeachers();
             adminTeachersContainer.innerHTML = '';
 
             if (teachers.length === 0) {
@@ -727,8 +726,338 @@
             });
         }
 
-        // باقي الدوال والوظائف كما هي في الكود الأصلي
-        // ... (جميع الدوال الأخرى تبقى كما هي بدون تغيير)
+        // عرض واجهة إدارة المحاضرات للأدمن
+        function showManageLectures(teacherId) {
+            currentTeacherId = teacherId;
+            const teacher = teachers.find(t => t.id === teacherId);
+            if (!teacher) return;
+
+            document.getElementById('manage-lectures-title').textContent = `إدارة محاضرات الأستاذ ${teacher.name}`;
+            adminLecturesContainer.innerHTML = '';
+
+            if (!teacher.lectures || teacher.lectures.length === 0) {
+                adminLecturesContainer.innerHTML = '<p>لا توجد محاضرات لهذا المدرس</p>';
+            } else {
+                teacher.lectures.forEach(lecture => {
+                    const lectureItem = document.createElement('div');
+                    lectureItem.className = 'lecture-item';
+                    if (darkMode) lectureItem.classList.add('dark-mode');
+                    lectureItem.innerHTML = `
+                        <span class="lecture-title">${lecture.title}</span>
+                        <div>
+                            <a href="${lecture.link}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-eye"></i> عرض
+                            </a>
+                            <button class="btn btn-warning edit-lecture-btn" data-lecture-id="${lecture.id}">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger delete-lecture-btn" data-lecture-id="${lecture.id}">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    `;
+                    adminLecturesContainer.appendChild(lectureItem);
+                });
+
+                // إضافة مستمعي الأحداث للأزرار
+                document.querySelectorAll('.edit-lecture-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const lectureId = btn.getAttribute('data-lecture-id');
+                        editLecture(lectureId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-lecture-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const lectureId = btn.getAttribute('data-lecture-id');
+                        if (confirm('هل أنت متأكد من حذف هذا الفصل؟')) {
+                            deleteLecture(lectureId);
+                        }
+                    });
+                });
+            }
+
+            adminTeachersSection.style.display = 'none';
+            addTeacherSection.style.display = 'none';
+            manageLecturesSection.style.display = 'block';
+            addLectureSection.style.display = 'none';
+        }
+
+        // عرض نموذج إضافة/تعديل مدرس
+        function showAddTeacherForm(editMode = false, teacherId = null) {
+            if (editMode) {
+                document.querySelector('#add-teacher-section .section-title').textContent = 'تعديل المدرس';
+                const teacher = teachers.find(t => t.id === teacherId);
+                if (teacher) {
+                    document.getElementById('teacher-name').value = teacher.name;
+                    document.getElementById('teacher-desc').value = teacher.desc;
+                    currentTeacherId = teacherId;
+                }
+                isEditMode = true;
+            } else {
+                document.querySelector('#add-teacher-section .section-title').textContent = 'إضافة مدرس جديد';
+                document.getElementById('teacher-name').value = '';
+                document.getElementById('teacher-desc').value = '';
+                currentTeacherId = null;
+                isEditMode = false;
+            }
+
+            adminTeachersSection.style.display = 'none';
+            manageLecturesSection.style.display = 'none';
+            addTeacherSection.style.display = 'block';
+        }
+
+        // عرض نموذج إضافة/تعديل فصل
+        function showAddLectureForm(editMode = false, lectureId = null) {
+            if (editMode) {
+                document.getElementById('lecture-form-title').textContent = 'تعديل الفصل';
+                const teacher = teachers.find(t => t.id === currentTeacherId);
+                if (teacher && teacher.lectures) {
+                    const lecture = teacher.lectures.find(l => l.id === lectureId);
+                    if (lecture) {
+                        document.getElementById('lecture-title').value = lecture.title;
+                        document.getElementById('lecture-link').value = lecture.link;
+                        document.getElementById('lecture-id').value = lectureId;
+                        currentLectureId = lectureId;
+                    }
+                }
+                isEditMode = true;
+            } else {
+                document.getElementById('lecture-form-title').textContent = 'إضافة فصل جديد';
+                document.getElementById('lecture-title').value = '';
+                document.getElementById('lecture-link').value = '';
+                document.getElementById('lecture-id').value = '';
+                currentLectureId = null;
+                isEditMode = false;
+            }
+
+            document.getElementById('teacher-id').value = currentTeacherId;
+            manageLecturesSection.style.display = 'block';
+            addLectureSection.style.display = 'block';
+        }
+
+        // تعديل مدرس
+        function editTeacher(teacherId) {
+            showAddTeacherForm(true, teacherId);
+        }
+
+        // تعديل فصل
+        function editLecture(lectureId) {
+            showAddLectureForm(true, lectureId);
+        }
+
+        // حذف مدرس
+        function deleteTeacher(teacherId) {
+            teachers = teachers.filter(t => t.id !== teacherId);
+            saveTeachers();
+            renderTeachers();
+            if (currentTeacherId === teacherId) {
+                adminTeachersSection.style.display = 'block';
+                manageLecturesSection.style.display = 'none';
+                addLectureSection.style.display = 'none';
+                currentTeacherId = null;
+            }
+        }
+
+        // حذف فصل
+        function deleteLecture(lectureId) {
+            const teacherIndex = teachers.findIndex(t => t.id === currentTeacherId);
+            if (teacherIndex !== -1) {
+                if (!teachers[teacherIndex].lectures) teachers[teacherIndex].lectures = [];
+                teachers[teacherIndex].lectures = teachers[teacherIndex].lectures.filter(l => l.id !== lectureId);
+                saveTeachers();
+                showManageLectures(currentTeacherId);
+            }
+        }
+
+        // تسجيل الدخول
+        function login(username, password) {
+            // بيانات تسجيل الدخول المشفرة (base64)
+            const encodedUsername = 'YWE='; // aa
+            const encodedPassword = 'YWE='; // aa
+
+            const inputUsername = btoa(unescape(encodeURIComponent(username)));
+            const inputPassword = btoa(unescape(encodeURIComponent(password)));
+
+            if (inputUsername === encodedUsername && inputPassword === encodedPassword) {
+                loginModal.style.display = 'none';
+                adminPanel.style.display = 'block';
+                renderTeachers();
+                initDarkMode();
+                return true;
+            } else {
+                loginError.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                loginError.style.display = 'block';
+                return false;
+            }
+        }
+
+        // تسجيل الخروج
+        function logout() {
+            window.location.href = 'index.html';
+        }
+
+        // تبديل الوضع الليلي/النهاري
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            localStorage.setItem('darkMode', darkMode);
+
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.teacher-card, .admin-content, .login-form').forEach(el => {
+                el.classList.toggle('dark-mode');
+            });
+            document.querySelectorAll('.lecture-item').forEach(el => {
+                el.classList.toggle('dark-mode');
+            });
+
+            if (darkMode) {
+                adminModeToggle.textContent = '☀️';
+            } else {
+                adminModeToggle.textContent = '🌙';
+            }
+        }
+
+        // تحميل صورة المدرس
+        function loadTeacherImage() {
+            return new Promise((resolve) => {
+                const file = teacherImageInput.files[0];
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resolve(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // مستمعي الأحداث
+        closeLoginModal.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            login(username, password);
+        });
+
+        addTeacherForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('teacher-name').value;
+            const desc = document.getElementById('teacher-desc').value;
+            const image = await loadTeacherImage();
+
+            if (isEditMode && currentTeacherId) {
+                // تعديل مدرس موجود
+                const teacherIndex = teachers.findIndex(t => t.id === currentTeacherId);
+                if (teacherIndex !== -1) {
+                    teachers[teacherIndex].name = name;
+                    teachers[teacherIndex].desc = desc;
+                    if (image) {
+                        teachers[teacherIndex].image = image;
+                    }
+                }
+            } else {
+                // إضافة مدرس جديد
+                const newTeacher = {
+                    id: Date.now().toString(),
+                    name,
+                    desc,
+                    lectures: []
+                };
+                if (image) {
+                    newTeacher.image = image;
+                }
+                teachers.push(newTeacher);
+            }
+
+            saveTeachers();
+            renderTeachers();
+            adminTeachersSection.style.display = 'block';
+            addTeacherSection.style.display = 'none';
+            isEditMode = false;
+            currentTeacherId = null;
+            teacherImageInput.value = '';
+        });
+
+        cancelAddTeacher.addEventListener('click', () => {
+            adminTeachersSection.style.display = 'block';
+            addTeacherSection.style.display = 'none';
+            isEditMode = false;
+            currentTeacherId = null;
+            teacherImageInput.value = '';
+        });
+
+        addLectureBtn.addEventListener('click', () => {
+            showAddLectureForm();
+        });
+
+        lectureForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('lecture-title').value;
+            const link = document.getElementById('lecture-link').value;
+            const teacherId = document.getElementById('teacher-id').value;
+
+            const teacherIndex = teachers.findIndex(t => t.id === teacherId);
+            if (teacherIndex !== -1) {
+                if (!teachers[teacherIndex].lectures) teachers[teacherIndex].lectures = [];
+
+                if (isEditMode && currentLectureId) {
+                    // تعديل فصل موجود
+                    const lectureIndex = teachers[teacherIndex].lectures.findIndex(l => l.id === currentLectureId);
+                    if (lectureIndex !== -1) {
+                        teachers[teacherIndex].lectures[lectureIndex].title = title;
+                        teachers[teacherIndex].lectures[lectureIndex].link = link;
+                    }
+                } else {
+                    // إضافة فصل جديد
+                    const newLecture = {
+                        id: Date.now().toString(),
+                        title,
+                        link
+                    };
+                    teachers[teacherIndex].lectures.push(newLecture);
+                }
+
+                saveTeachers();
+                showManageLectures(teacherId);
+                isEditMode = false;
+                currentLectureId = null;
+            }
+        });
+
+        cancelLectureBtn.addEventListener('click', () => {
+            addLectureSection.style.display = 'none';
+            isEditMode = false;
+            currentLectureId = null;
+        });
+
+        adminModeToggle.addEventListener('click', toggleDarkMode);
+
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
+
+        addTeacherLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAddTeacherForm();
+        });
+
+        adminHomeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            adminTeachersSection.style.display = 'block';
+            addTeacherSection.style.display = 'none';
+            manageLecturesSection.style.display = 'none';
+            addLectureSection.style.display = 'none';
+            currentTeacherId = null;
+            currentLectureId = null;
+        });
 
         // تهيئة التطبيق عند التحميل
         document.addEventListener('DOMContentLoaded', loadData);
