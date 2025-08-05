@@ -288,22 +288,6 @@
             color: var(--light-color);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .teachers-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .search-bar {
-                width: 100%;
-            }
-        }
-
         /* Subscription Modal Styles */
         .subscription-modal {
             position: fixed;
@@ -372,6 +356,22 @@
             margin: 15px 0;
             line-height: 1.6;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .teachers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -380,7 +380,7 @@
         <div class="subscription-box" id="subscription-box">
             <div class="close-btn" id="close-btn">✕</div>
             <h2>اشترك في قناتنا على تلغرام</h2>
-            <p class="subscription-text">للاستمرار في استخدام المنصة، يرجى الاشتراك في قناتنا على تلغرام للحصول على آخر التحديثات والمحتوى الحصري.</p>
+            <p class="subscription-text">للاستمرار في استخدام المنصة، يرجى الاشتراك في قناتنا على تلغرام للحصول على آخر التحديثات والمحتوي الحصري.</p>
             <img src="https://i.imghippo.com/files/IyLa8183oYA.jpg" alt="قناة تلغرام" class="channel-image">
             <a href="https://t.me/uumm20" class="join-btn" target="_blank">
                 <i class="fab fa-telegram"></i> انضم إلى القناة
@@ -411,7 +411,7 @@
                 المدرسين لدينا
             </h2>
             <div class="teachers-grid" id="teachers-container">
-                <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
+                <!-- سيتم ملء هذا القسم بالبيانات من ملف JSON -->
             </div>
         </section>
 
@@ -421,7 +421,7 @@
                 محاضرات الأستاذ
             </h2>
             <div class="lectures-list" id="lectures-container">
-                <!-- سيتم ملء هذا القسم بالبيانات من localStorage -->
+                <!-- سيتم ملء هذا القسم بالبيانات من ملف JSON -->
             </div>
         </section>
     </div>
@@ -433,7 +433,7 @@
                 <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
                 <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
             </div>
-            <div class="copyright">جميع الحقوق محفوضه لدى منصة ماكس</div>
+            <div class="copyright">جميع الحقوق محفوظة لدى منصة ماكس</div>
             <a href="https://t.me/max10max10bot" class="telegram-link" target="_blank">
                 <i class="fab fa-telegram"></i>
                 <span>بوت ملازم ماكس</span>
@@ -482,25 +482,23 @@
             }
         }
 
-        // تحميل البيانات من localStorage
-        function loadTeachers() {
-            const savedTeachers = localStorage.getItem('teachers');
-            if (savedTeachers) {
-                try {
-                    teachers = JSON.parse(savedTeachers);
-                } catch (e) {
-                    console.error('Error parsing teachers data:', e);
-                    teachers = [];
-                }
-            } else {
-                teachers = [];
+        // جلب البيانات من ملف JSON
+        async function fetchTeachers() {
+            try {
+                const response = await fetch('data.json');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                teachers = data.teachers || [];
+                return teachers;
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+                return [];
             }
         }
 
         // عرض المدرسين مع إمكانية البحث
-        function renderTeachers(searchTerm = '') {
-            loadTeachers(); // تحميل أحدث البيانات قبل العرض
-            
+        async function renderTeachers(searchTerm = '') {
+            await fetchTeachers();
             teachersContainer.innerHTML = '';
 
             const filteredTeachers = teachers.filter(teacher => 
@@ -552,9 +550,8 @@
         }
 
         // عرض محاضرات مدرس معين
-        function showTeacherLectures(teacherId) {
-            loadTeachers(); // تحميل أحدث البيانات قبل العرض
-            
+        async function showTeacherLectures(teacherId) {
+            await fetchTeachers();
             const teacher = teachers.find(t => t.id === teacherId);
             if (!teacher) return;
 
@@ -604,9 +601,9 @@
         }
 
         // البحث عن المدرسين
-        function searchTeachers() {
+        async function searchTeachers() {
             const searchTerm = searchInput.value;
-            renderTeachers(searchTerm);
+            await renderTeachers(searchTerm);
         }
 
         // مستمعي الأحداث
@@ -623,9 +620,8 @@
         });
 
         // تهيئة التطبيق عند التحميل
-        document.addEventListener('DOMContentLoaded', () => {
-            loadTeachers();
-            renderTeachers();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderTeachers();
             initDarkMode();
             checkSubscription();
         });
